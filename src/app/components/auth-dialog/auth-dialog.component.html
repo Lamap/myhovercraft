@@ -1,0 +1,15 @@
+<div class="hvr-auth-dialog">
+  <input
+    class="hvr-auth-dialog__email form-control"
+    type="text"
+    placeholder="email"
+    [(ngModel)]="data.email"
+  />
+  <input
+    class="hvr-auth-dialog__password form-control"
+    type="password"
+    placeholder="password"
+    [(ngModel)]="data.password"
+  />
+  <button class="hvr-auth-dialog__submit btn btn-light" (click)="submit()">LOGIN</button>
+</div>

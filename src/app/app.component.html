@@ -1,7 +1,39 @@
-<div style="text-align:center">
-  <h1>
-    Bámulatos {{title}}!
-  </h1>
-  <input type="text">
+<div class="hvr-app">
+  <div class="hvr-app__header">
+    <h1>
+      My hovecraft is full of eels.
+    </h1>
+    <div class="hvr-layout__auth-box">
+      <span
+              class="hvr-layout__auth-login"
+              *ngIf="!(user$ | async)"
+              (click)="logIn()"
+      >
+          <i class="material-icons md-18">
+            account_circle
+          </i>
+      </span>
+      <div
+              class="hvr-layout__auth-logout"
+              *ngIf="user$ | async"
+              (click)="logOut()"
+      >
+        <span class="hvr-layout__auth-username" >{{userEmail}}</span>
+        <i class="material-icons md-18">
+          exit_to_app
+        </i>
+      </div>
+    </div>
+  </div>
+  <mat-form-field>
+    <input matInput type="text" placeholder="csicskajenő">
+    <mat-chip-list #chipList>
+      <mat-chip>béla</mat-chip>
+    </mat-chip-list>
+  </mat-form-field>
+  <mat-icon>cancel</mat-icon>
+  <mat-checkbox>jenő</mat-checkbox>
+  <br>
+  <hvr-imagelist></hvr-imagelist>
 </div>
 
