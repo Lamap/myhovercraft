@@ -23,13 +23,15 @@ import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { FormsModule } from '@angular/forms';
 import { FileSelectorComponent } from './components/file-selector/file-selector.component';
+import { ImagelistItemComponent } from './components/imagelist-item/imagelist-item.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ImagelistComponent,
     AuthDialogComponent,
-    FileSelectorComponent
+    FileSelectorComponent,
+    ImagelistItemComponent
   ],
   imports: [
     BrowserModule,

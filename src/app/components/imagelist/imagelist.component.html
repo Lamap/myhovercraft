@@ -1,0 +1,21 @@
+<div class="hvr-imagelist">
+  <div class="hvr-imagelist__header">
+    <hvr-file-selector
+        (fileSelected$)="fileSelected($event)"
+        *ngIf="authService.user$ | async"
+    ></hvr-file-selector>
+  </div>
+  <div class="hvr-imagelist__items">
+    <div
+        class="hvr-imagelist__items-col"
+        [ngClass]="colClass"
+        *ngFor="let col of structuredImages"
+    >
+      <hvr-imagelist-item
+              *ngFor="let image of col"
+              [image]="image"
+              (remove$)="removeImage(image)"
+      ></hvr-imagelist-item>
+    </div>
+  </div>
+</div>

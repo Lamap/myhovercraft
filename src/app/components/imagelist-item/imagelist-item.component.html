@@ -1,0 +1,7 @@
+<div class="hvr-imagelist-item">
+  <span *ngIf="authService.user$ | async" class="hvr-imagelist-item__remove" (click)="removeMe()">
+    <i  class="material-icons">delete</i>
+  </span>
+  <img class="hvr-imagelist-item__image" [src]="image.url" />
+  <div class="hvr-imagelist-items__tags"></div>
+</div>
