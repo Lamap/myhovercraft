@@ -4,5 +4,13 @@
 // The list of which env maps to which file can be found in `.angular-cli.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  firebase: {
+    apiKey: 'AIzaSyA8GLSt5-OR-NS2D--48mF7op22u7V0lz0',
+    authDomain: 'myhovecraft.firebaseapp.com',
+    databaseURL: 'https://myhovecraft.firebaseio.com',
+    projectId: 'myhovecraft',
+    storageBucket: 'myhovecraft.appspot.com',
+    messagingSenderId: '420885254001'
+  }
 };

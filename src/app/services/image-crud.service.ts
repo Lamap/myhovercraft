@@ -1,5 +1,5 @@
-import {EventEmitter, Injectable} from '@angular/core';
-import {BehaviorSubject, Observable, forkJoin, combineLatest} from 'rxjs/index';
+import { EventEmitter, Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, forkJoin, combineLatest } from 'rxjs/index';
 import * as firebase from 'firebase';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
 import { map, switchMap, mapTo, filter } from 'rxjs/internal/operators';
@@ -17,6 +17,10 @@ export interface ImageQuery {
     tags: string[];
 }
 
+interface ITagObject {
+    value: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -24,10 +28,12 @@ export class ImageCrudService {
 
   public taskProgress = 0;
   public imageList$: Observable<ImageData[]>;
+  public tagList$: Observable<string[]>;
 
   private storageRef;
   private basePath = 'hvr';
   private imagesFBCollectionRef: AngularFirestoreCollection<ImageData>;
+  private tagsFBCollectionRef: AngularFirestoreCollection<ITagObject>;
 
   public query$ = new BehaviorSubject<ImageQuery | null>({
       limit: 20,
@@ -35,18 +41,19 @@ export class ImageCrudService {
   });
 
   private images: ImageData[];
-  public imagesWrapped = new EventEmitter<ImageData[]>();
+  public imagesWrapped$ = new EventEmitter<ImageData[]>();
 
   constructor(private store: AngularFirestore) {
       this.storageRef = firebase.storage().ref();
 
-      this.imagesFBCollectionRef = store.collection<ImageData>('images');
+      this.tagsFBCollectionRef = store.collection<ITagObject>('tags', ref => ref.orderBy('value', 'asc'));
+      this.tagList$ = this.tagsFBCollectionRef.valueChanges().pipe(map(tags => tags.map(tag => (<ITagObject>tag).value)));
 
+      this.imagesFBCollectionRef = store.collection<ImageData>('images', ref => ref.orderBy('filePath', 'desc'));
       this.imageList$ = this.imagesFBCollectionRef.snapshotChanges().pipe(map(changes => {
-          console.log('q: ', this.query$.getValue());
           return changes.map(change => {
              const data = change.payload.doc.data() as ImageData;
-             //console.log(data);
+             data.tags = data.tags instanceof Array ? data.tags : [];
              data.id = change.payload.doc.id;
              return data;
           });
@@ -56,27 +63,37 @@ export class ImageCrudService {
           if (!this.images) {
               return;
           }
-          this.imagesWrapped.emit(this.images.filter(this.filterImage));
+          this.imagesWrapped$.emit(this.images.filter(this.filterImage));
       });
-/*
-      this.query$.pipe(map(q => {
-          return this.imagesFBCollectionRef.snapshotChanges();
-      })).subscribe(q => console.log(q));
-      */
-      this.query$.subscribe(q => {
-         console.log('i:', this.images);
+
+      this.query$.subscribe(querySnapshot => {
           if (!this.images) {
               return;
           }
-         this.imagesWrapped.emit(this.images.filter(this.filterImage));
+          if (!querySnapshot.tags.length) {
+              this.imagesWrapped$.emit(this.images);
+              return;
+          }
+         this.imagesWrapped$.emit(this.images.filter(this.filterImage));
       });
-
-      this.imagesWrapped.subscribe(a => console.log('AAAA:' , a));
   }
 
   filterImage = (image) => {
-      console.log('filter::', this.query$.getValue())
-      return image.id === '4xUCUGpNzbQv6z5ihJcK';
+      const query: ImageQuery = this.query$.getValue();
+      if (!query.tags.length) {
+          return true;
+      }
+
+      if (!image.tags) {
+          return false;
+      }
+      for (const tag of query.tags) {
+          if (image.tags.indexOf(tag) === -1) {
+              return false;
+          }
+      }
+
+      return true;
   }
 
   public upload(file: File) {
@@ -118,7 +135,7 @@ export class ImageCrudService {
         });
     }
 
-    delete(image: ImageData) {
+    deleteImage(image: ImageData) {
         if (!image.filePath && !image.id) {
             return;
         }
@@ -139,5 +156,27 @@ export class ImageCrudService {
             .catch(error => {
                 console.warn('Failed to delete: ', error);
             });
+    }
+
+    addNewTag(image: ImageData, tag: string) {
+        this.tagsFBCollectionRef.add({
+            value: tag
+        }).then(doc => {
+            console.log('newTag is saved');
+            this.addTagToImage(image, tag);
+        });
+    }
+
+    addTagToImage(image: ImageData, tag: string) {
+      if (!(image.tags instanceof Array)) {
+          image.tags = [];
+      }
+      image.tags.push(tag);
+      this.imagesFBCollectionRef.doc(image.id).update(image);
+    }
+
+    removeTagFromImage(image: ImageData, tag: string) {
+      image.tags = image.tags.filter(imageTag => tag !== imageTag);
+      this.imagesFBCollectionRef.doc(image.id).update(image).then(res => console.log(res)).catch(err => console.log(err));
     }
 }

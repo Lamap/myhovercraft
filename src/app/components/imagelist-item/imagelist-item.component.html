@@ -3,5 +3,41 @@
     <i  class="material-icons">delete</i>
   </span>
   <img class="hvr-imagelist-item__image" [src]="image.url" />
-  <div class="hvr-imagelist-items__tags"></div>
+  <div class="hvr-imagelist-item__static-tags" *ngIf="!(authService.user$ | async) && image.tags.length">
+    <span
+      class="hvr-imagelist-item__static-tag-item"
+      *ngFor="let tag of image.tags"
+    >
+      #{{tag}}
+    </span>
+  </div>
+  <mat-form-field class="hvr-imagelist-item__dynamic-tags" *ngIf="authService.user$ | async">
+    <mat-chip-list #chipList>
+      <mat-chip
+              *ngFor="let tag of image.tags"
+              [selectable]="false"
+              [removable]="true"
+              (removed)="removeTag(tag)"
+      >
+          {{tag}}
+        <mat-icon matChipRemove >cancel</mat-icon>
+      </mat-chip>
+      <input
+        #tagInput
+        matInput
+        type="text"
+        placeholder="Add tag"
+        [formControl]="tagFormControl"
+        [matAutocomplete]="auto"
+        [matChipInputFor]="chipList"
+        [matChipInputAddOnBlur]="true"
+        (matChipInputTokenEnd)="addNewTag($event)"
+      >
+    </mat-chip-list>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectTag($event)">
+      <mat-option *ngFor="let tag of filteredAllTags" [value]="tag">
+        {{tag}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
 </div>

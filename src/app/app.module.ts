@@ -21,9 +21,10 @@ import { AngularFireModule } from 'angularfire2';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FileSelectorComponent } from './components/file-selector/file-selector.component';
 import { ImagelistItemComponent } from './components/imagelist-item/imagelist-item.component';
+import { ImagelistHeaderComponent } from './components/imagelist-header/imagelist-header.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { ImagelistItemComponent } from './components/imagelist-item/imagelist-it
     ImagelistComponent,
     AuthDialogComponent,
     FileSelectorComponent,
-    ImagelistItemComponent
+    ImagelistItemComponent,
+    ImagelistHeaderComponent
   ],
   imports: [
     BrowserModule,
@@ -48,7 +50,8 @@ import { ImagelistItemComponent } from './components/imagelist-item/imagelist-it
     AngularFirestoreModule,
     AngularFireDatabaseModule,
     AngularFireAuthModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent],

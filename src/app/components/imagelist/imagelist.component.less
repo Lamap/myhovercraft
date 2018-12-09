@@ -1,13 +1,22 @@
-.hvr-imagelist {
-  &__header {
+@import "../../variables";
 
+.hvr-imagelist {
+  background: @main-bg-color;
+  &__header {
+    position: relative;
+    min-height: 40px;
+    padding: 0 10px;
+  }
+  &__add-new-button {
+    position: absolute;
+    right: 0;
+    z-index: 1000;
   }
   &__items {
-    background: #eee;
     display: flex;
   }
   &__items-col {
-    padding: 5px;
+    padding: 10px;
 
     &--split-1 {
       width: 100%;

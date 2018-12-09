@@ -1,23 +1,43 @@
-.hvr {
-  .aut-button {
+@import "variables";
+
+.hvr-layout {
+  .auth-button {
     cursor: pointer;
     font-size: 12px;
     margin-left: 10px;
   }
   &__auth-box {
-      color: white;
-      &:hover {
-         color: #333;
+      color: #aaa;
+      position: absolute;
+      right: 0;
+      top: 0;
+      cursor: pointer;
+      display: inline-block;
+      opacity: 0;
+    &:hover {
+        color: #333;
+        opacity: 1;
       }
   }
   &__auth-login {
-    .aut-button;
+    .auth-button;
   }
   &__auth-logout {
-    .aut-button;
-       display: flex;
-       align-items: center;
-    }
+    .auth-button;
+     display: flex;
+     align-items: center;
+  }
+
+  &__header {
+    padding: 10px;
+    position: relative;
+    background: @main-bg-color;
+  }
+  &__header-title {
+    color: #efefef;
+    font-size: 6.4vw;
+    text-transform: uppercase;
+  }
 }
 
 .hvr-rounded-button {
@@ -29,3 +49,4 @@
   border-radius: 100%;
   display: flex;
 }
+
