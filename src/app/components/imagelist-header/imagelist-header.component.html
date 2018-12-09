@@ -1,0 +1,30 @@
+<div>
+    <mat-form-field class="hvr-imagelist-header__form">
+        <mat-chip-list #chipList>
+            <mat-chip
+                    *ngFor="let tag of (imageService.query$ | async).tags"
+                    [selectable]="false"
+                    [removable]="true"
+                    (removed)="removeTag(tag)"
+            >
+                {{tag}}
+                <mat-icon matChipRemove >cancel</mat-icon>
+            </mat-chip>
+            <input
+                    #tagInput
+                    matInput
+                    type="text"
+                    placeholder="Filter by tags"
+                    [formControl]="tagFormControl"
+                    [matAutocomplete]="auto"
+                    [matChipInputFor]="chipList"
+                    [matChipInputAddOnBlur]="true"
+            >
+        </mat-chip-list>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectTag($event)">
+            <mat-option *ngFor="let tag of filteredTags" [value]="tag">
+                {{tag}}
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+</div>
