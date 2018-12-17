@@ -30,12 +30,17 @@
 
   &__header {
     padding: 10px;
-    position: relative;
     background: @main-bg-color;
+    height: @header-height;
+    width: 100%;
+    position: fixed;
+    z-index: @header-z-index;
+    top: 0;
+    font-family: 'Raleway', sans-serif;
   }
   &__header-title {
     color: #efefef;
-    font-size: 6.4vw;
+    font-size: 6.7vw;
     text-transform: uppercase;
   }
 }
