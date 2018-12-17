@@ -63,19 +63,24 @@ export class ImageCrudService {
           if (!this.images) {
               return;
           }
-          this.imagesWrapped$.emit(this.images.filter(this.filterImage));
+          this.imagesWrapped$.emit(this.queryList(this.images));
       });
 
       this.query$.subscribe(querySnapshot => {
           if (!this.images) {
               return;
           }
-          if (!querySnapshot.tags.length) {
-              this.imagesWrapped$.emit(this.images);
-              return;
-          }
-         this.imagesWrapped$.emit(this.images.filter(this.filterImage));
+         this.imagesWrapped$.emit(this.queryList(this.images));
       });
+  }
+
+  queryList(images: ImageData[]) {
+      const querySnapshot: ImageQuery = this.query$.getValue();
+      // TODO: include filtering so use the same querysnapshot
+      if (!querySnapshot.tags.length) {
+          return images.slice(0, querySnapshot.limit);
+      }
+      return images.filter(this.filterImage).slice(0, querySnapshot.limit);
   }
 
   filterImage = (image) => {

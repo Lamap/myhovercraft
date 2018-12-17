@@ -8,6 +8,9 @@ import { Observable, fromEvent } from 'rxjs/index';
   templateUrl: './imagelist.component.html',
   styleUrls: ['./imagelist.component.less']
 })
+
+// TODO: use this: https://k3nsei.gitbook.io/ng-in-viewport/getting-started/installation
+
 export class ImagelistComponent implements OnInit {
 
   public images: ImageData[];
@@ -55,6 +58,10 @@ export class ImagelistComponent implements OnInit {
   fileSelected($event: File) {
     console.log('file selected', $event);
     this.imageService.upload($event);
+  }
+
+  replaceImage($event: File, image: ImageData) {
+      console.log(image, $event);
   }
 
   ngOnInit() {

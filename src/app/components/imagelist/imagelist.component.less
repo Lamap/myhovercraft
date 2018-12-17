@@ -1,11 +1,16 @@
 @import "../../variables";
+@list-header-height: 50px;
 
 .hvr-imagelist {
   background: @main-bg-color;
   &__header {
-    position: relative;
-    min-height: 40px;
+    position: fixed;
+    width: 100%;
+    z-index: @header-z-index;
+    top: @header-height;
+    height: @list-header-height;
     padding: 0 10px;
+    background: @main-bg-color;
   }
   &__add-new-button {
     position: absolute;
@@ -14,6 +19,7 @@
   }
   &__items {
     display: flex;
+    margin-top: @list-header-height + @header-height;
   }
   &__items-col {
     padding: 10px;
@@ -36,5 +42,10 @@
     &--split-6 {
       width: 16.6%;
     }
+  }
+
+  &__load-indicator {
+    height: 20px;
+    background: red;
   }
 }

@@ -12,7 +12,6 @@ export class ImagelistHeaderComponent implements OnInit {
 
     @Input() avalaibleTags: string[];
 
-    public selectedTags: string[] = [];
     public filteredTags: string[];
     public tagFormControl  = new FormControl();
 
@@ -31,7 +30,6 @@ export class ImagelistHeaderComponent implements OnInit {
         console.log('selectTag', event.option.value);
         this.tagInput.nativeElement.value = '';
         this.tagFormControl.setValue(null);
-        this.selectedTags.push(event.option.value);
         const selectedTag = event.option.value;
         const querySnapShot = this.imageService.query$.getValue();
         querySnapShot.tags.push(selectedTag);
@@ -45,12 +43,13 @@ export class ImagelistHeaderComponent implements OnInit {
     }
     setFilteredTagList(value) {
         console.log(value);
+        const selectedTags = this.imageService.query$.getValue().tags;
         if (!value) {
-            this.filteredTags = this.avalaibleTags.filter(tag => this.selectedTags.indexOf(tag) === -1);
+            this.filteredTags = this.avalaibleTags.filter(tag => selectedTags.indexOf(tag) === -1);
             return;
         }
         this.filteredTags = this.avalaibleTags.filter(tag => {
-            return this.selectedTags.indexOf(tag) === -1 && tag.indexOf(value) !== -1;
+            return selectedTags.indexOf(tag) === -1 && tag.indexOf(value) !== -1;
         });
     }
 

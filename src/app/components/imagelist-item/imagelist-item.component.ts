@@ -16,6 +16,7 @@ export class ImagelistItemComponent implements OnInit {
   @Input() image: ImageData;
   @Input() avalaibleTags: string[];
   @Output() remove$ = new EventEmitter<VoidFunction>();
+  @Output() replace$ = new EventEmitter<File>();
   @Output() addNewTag$ = new EventEmitter<string>();
   @Output() addTag$ = new EventEmitter<string>();
   @Output() removeTag$ = new EventEmitter<string>();
@@ -49,6 +50,10 @@ export class ImagelistItemComponent implements OnInit {
 
   removeMe() {
     this.remove$.emit();
+  }
+
+  replaceMe(file: File) {
+    this.replace$.emit(file);
   }
 
   selectTag(event: MatAutocompleteSelectedEvent) {
