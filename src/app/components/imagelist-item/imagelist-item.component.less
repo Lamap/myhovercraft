@@ -5,10 +5,31 @@
   margin-bottom: 20px;
   border-radius: 8px;
   overflow: hidden;
-  min-height: 120px;
+  min-height: 130px;
   background: #fff;
+  &--selected {
+    border: 2px solid #6c757d;
+    box-shadow: rgba(0, 0, 0, .4) 4px 4px 4px;
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 20px;
+      width: 100%;
+      background: rgba(0, 0, 0, .6);
+    }
+  }
   &__image {
     width: 100%;
+  }
+  &__actions {
+    opacity: 0;
+    transition: opacity 0.5s;
+    .hvr-imagelist-item:hover & {
+      opacity: 1;
+    }
   }
   &__remove {
     .hvr-rounded-button;
@@ -18,7 +39,19 @@
   }
   &__replace {
     position: absolute;
-    top: 40px;
+    top: 38px;
+    right: 0;
+  }
+  &__download {
+    .hvr-rounded-button;
+    position: absolute;
+    top: 76px;
+    right: 0;
+  }
+  &__open {
+    .hvr-rounded-button;
+    position: absolute;
+    top: 112px;
     right: 0;
   }
   &__static-tags {

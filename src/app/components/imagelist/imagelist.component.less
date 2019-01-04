@@ -1,8 +1,10 @@
 @import "../../variables";
-@list-header-height: 50px;
+@list-header-height: 60px;
+@list-top: @list-header-height + @header-height;
 
 .hvr-imagelist {
   background: @main-bg-color;
+  position: relative;
   &__header {
     position: fixed;
     width: 100%;
@@ -12,14 +14,10 @@
     padding: 0 10px;
     background: @main-bg-color;
   }
-  &__add-new-button {
-    position: absolute;
-    right: 0;
-    z-index: 1000;
-  }
   &__items {
     display: flex;
-    margin-top: @list-header-height + @header-height;
+    margin-top: @list-top;
+    min-height: ~"calc(100vh - @{list-top})";
   }
   &__items-col {
     padding: 10px;
@@ -42,10 +40,24 @@
     &--split-6 {
       width: 16.6%;
     }
+    &--split-7 {
+      width: 14.28%;
+    }
+    &--split-8 {
+      width: 12.5%;
+    }
+    &--split-9 {
+      width: 11.11%;
+    }
+    &--split-10 {
+      width: 10%;
+    }
   }
 
   &__load-indicator {
     height: 20px;
-    background: red;
+    width: 100%;
+    position: absolute;
+    bottom: 100px;
   }
 }

@@ -1,13 +1,28 @@
-<div class="hvr-imagelist-item">
-  <span *ngIf="authService.user$ | async" class="hvr-imagelist-item__remove" (click)="removeMe()">
-    <i  class="material-icons">delete</i>
-  </span>
-  <hvr-file-selector
-          class="hvr-imagelist-item__replace"
-          (fileSelected$)="replaceMe($event)"
-          *ngIf="authService.user$ | async"
-  ></hvr-file-selector>
-  <img class="hvr-imagelist-item__image" [src]="image.url" />
+<div class="hvr-imagelist-item" [ngClass]="{'hvr-imagelist-item--selected': image.selected}">
+  <div class="hvr-imagelist-item__actions">
+    <span *ngIf="authService.user$ | async" class="hvr-imagelist-item__remove" (click)="removeMe()">
+      <i  class="material-icons">delete</i>
+    </span>
+    <hvr-file-selector
+            class="hvr-imagelist-item__replace"
+            (fileSelected$)="replaceMe($event)"
+            *ngIf="authService.user$ | async"
+    ></hvr-file-selector>
+    <a
+            *ngIf="authService.user$ | async"
+            class="hvr-imagelist-item__download"
+            [href]="image.url"
+            target="_blank"
+            download="{{image.originalName}}"
+    >
+      <i  class="material-icons">archive</i>
+    </a>
+    <span *ngIf="authService.user$ | async" class="hvr-imagelist-item__open" (click)="openInModal()">
+      <i  class="material-icons">open_in_new</i>
+    </span>
+  </div>
+
+  <img class="hvr-imagelist-item__image" [src]="image.url" (click)="imageClicked()"/>
   <div class="hvr-imagelist-item__static-tags" *ngIf="!(authService.user$ | async) && image.tags.length">
     <span
       class="hvr-imagelist-item__static-tag-item"
@@ -23,6 +38,7 @@
               [selectable]="false"
               [removable]="true"
               (removed)="removeTag(tag)"
+              (click)="onTagClicked(tag)"
       >
           {{tag}}
         <mat-icon matChipRemove >cancel</mat-icon>

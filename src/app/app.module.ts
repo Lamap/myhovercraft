@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { InViewportModule } from 'ng-in-viewport';
 
 import { AppComponent } from './app.component';
 import {
@@ -25,6 +26,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FileSelectorComponent } from './components/file-selector/file-selector.component';
 import { ImagelistItemComponent } from './components/imagelist-item/imagelist-item.component';
 import { ImagelistHeaderComponent } from './components/imagelist-header/imagelist-header.component';
+import { ImgEditDialogComponent } from './components/img-edit-dialog/img-edit-dialog.component';
+import { ImageModalComponent } from './components/image-modal/image-modal.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +36,9 @@ import { ImagelistHeaderComponent } from './components/imagelist-header/imagelis
     AuthDialogComponent,
     FileSelectorComponent,
     ImagelistItemComponent,
-    ImagelistHeaderComponent
+    ImagelistHeaderComponent,
+    ImgEditDialogComponent,
+    ImageModalComponent
   ],
   imports: [
     BrowserModule,
@@ -51,12 +56,15 @@ import { ImagelistHeaderComponent } from './components/imagelist-header/imagelis
     AngularFireDatabaseModule,
     AngularFireAuthModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    InViewportModule
   ],
   providers: [],
   bootstrap: [AppComponent],
   entryComponents: [
-    AuthDialogComponent
+    AuthDialogComponent,
+    ImgEditDialogComponent,
+    ImageModalComponent
   ],
 })
 export class AppModule { }

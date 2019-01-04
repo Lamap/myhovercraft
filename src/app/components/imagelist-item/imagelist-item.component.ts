@@ -2,9 +2,10 @@ import { Component, OnInit, Input, Output, EventEmitter, ElementRef, ViewChild} 
 import { ImageData } from '../../services/image-crud.service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { FormControl } from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material';
+import {MatAutocomplete, MatAutocompleteSelectedEvent, MatDialog, MatDialogConfig} from '@angular/material';
 import { Observable } from 'rxjs/index';
 import { startWith, map } from 'rxjs/internal/operators';
+import { ImageModalComponent } from '../image-modal/image-modal.component';
 
 @Component({
   selector: 'hvr-imagelist-item',
@@ -20,6 +21,8 @@ export class ImagelistItemComponent implements OnInit {
   @Output() addNewTag$ = new EventEmitter<string>();
   @Output() addTag$ = new EventEmitter<string>();
   @Output() removeTag$ = new EventEmitter<string>();
+  @Output() toggleImage$ = new EventEmitter<VoidFunction>();
+  @Output() tagSelected$ = new EventEmitter<String>();
 
   public tagFormControl  = new FormControl();
   public filteredAllTags: string[];
@@ -27,7 +30,7 @@ export class ImagelistItemComponent implements OnInit {
   @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
-  constructor(public authService: AuthenticationService) {
+  constructor(public authService: AuthenticationService, private dialog: MatDialog) {
 
     this.filteredAllTags = this.avalaibleTags;
     this.tagFormControl.valueChanges.subscribe(value => {
@@ -43,8 +46,10 @@ export class ImagelistItemComponent implements OnInit {
           this.filteredAllTags = this.avalaibleTags.filter(tag => this.image.tags.indexOf(tag) === -1);
           return;
       }
+      value = value.toLowerCase();
       this.filteredAllTags = this.avalaibleTags.filter(tag => {
-          return this.image.tags.indexOf(tag) === -1 && tag.indexOf(value) !== -1;
+        tag = tag.toLowerCase();
+        return this.image.tags.indexOf(tag) === -1 && tag.indexOf(value) !== -1;
       });
   }
 
@@ -78,4 +83,19 @@ export class ImagelistItemComponent implements OnInit {
     console.log(tag);
     this.removeTag$.emit(tag);
   }
+
+  imageClicked() {
+    this.toggleImage$.emit();
+  }
+
+  openInModal() {
+    console.log('modal:', this.image);
+      this.dialog.open(ImageModalComponent,
+          {data: {image: this.image}} as MatDialogConfig);
+  }
+
+  onTagClicked(tag: string) {
+    this.tagSelected$.emit(tag);
+  }
+
 }

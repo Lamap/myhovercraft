@@ -1,4 +1,4 @@
-<div>
+<div class="hvr-imagelist-header">
     <mat-form-field class="hvr-imagelist-header__form">
         <mat-chip-list #chipList>
             <mat-chip
@@ -27,4 +27,25 @@
             </mat-option>
         </mat-autocomplete>
     </mat-form-field>
+    <div class="hvr-imagelist-header__actions" *ngIf="authService.user$ | async">
+        <span *ngIf="selectedImages && selectedImages.length > 1">
+             <span class="hvr-imagelist-header__add-tag" (click)="addTag()">
+              <i  class="material-icons">note_add</i>
+            </span>
+             <span class="hvr-imagelist-header__remove" (click)="remove()">
+              <i  class="material-icons">delete</i>
+            </span>
+            <span class="hvr-imagelist-header__download" (click)="download()">
+              <i  class="material-icons">archive</i>
+            </span>
+             the selected {{selectedImages.length}} images[s]
+            <span class="hvr-imagelist-header__clear" (click)="clear()">
+              <i  class="material-icons">clear</i>
+            </span>
+        </span>
+        <hvr-file-selector
+                class="hvr-imagelist-header__add-new-button"
+                (fileSelected$)="fileSelected($event)"
+        ></hvr-file-selector>
+    </div>
 </div>

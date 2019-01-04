@@ -1,12 +1,10 @@
 <div class="hvr-imagelist">
   <div class="hvr-imagelist__header">
-    <hvr-file-selector
-        class="hvr-imagelist__add-new-button"
-        (fileSelected$)="fileSelected($event)"
-        *ngIf="authService.user$ | async"
-    ></hvr-file-selector>
     <hvr-imagelist-header
         [avalaibleTags]="availableTags"
+        [selectedImages]="selectedImages"
+        (uploadImage$)="fileSelected($event)"
+        (clearSelections$)="clearSelection()"
     ></hvr-imagelist-header>
   </div>
   <div class="hvr-imagelist__items">
@@ -24,8 +22,15 @@
               (addTag$)="addTag($event, image)"
               (removeTag$)="removeTag($event, image)"
               (replace$)="replaceImage($event, image)"
+              (toggleImage$)="toggleSelection(image)"
+              (tagSelected$)="tagSelected($event)"
       ></hvr-imagelist-item>
     </div>
   </div>
-  <div class="hvr-imagelist__load-indicator"></div>
+  <div
+    class="hvr-imagelist__load-indicator"
+    inViewport
+    [inViewportOptions]="{ threshold: [0] }"
+    (inViewportAction)="loadMore($event)"
+  ></div>
 </div>

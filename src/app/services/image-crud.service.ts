@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable, forkJoin, combineLatest } from 'rxjs/index
 import * as firebase from 'firebase';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
 import { map, switchMap, mapTo, filter } from 'rxjs/internal/operators';
+import {forEach} from "@angular/router/src/utils/collection";
 
 export interface ImageData {
   url: string;
@@ -10,6 +11,7 @@ export interface ImageData {
   tags?: string[];
   filePath: string;
   originalName: string;
+  selected?: boolean;
 }
 
 export interface ImageQuery {
@@ -26,28 +28,32 @@ interface ITagObject {
 })
 export class ImageCrudService {
 
-  public taskProgress = 0;
-  public imageList$: Observable<ImageData[]>;
-  public tagList$: Observable<string[]>;
-
   private storageRef;
   private basePath = 'hvr';
   private imagesFBCollectionRef: AngularFirestoreCollection<ImageData>;
   private tagsFBCollectionRef: AngularFirestoreCollection<ITagObject>;
+  private images: ImageData[];
+  private currentTagList: string[] = [];
 
+  public defaultImageLimit = 20;
+  public taskProgress = 0;
+  public imageList$: Observable<ImageData[]>;
+  public imagesWrapped$ = new EventEmitter<ImageData[]>();
+
+  public tagList$: Observable<string[]>;
   public query$ = new BehaviorSubject<ImageQuery | null>({
-      limit: 20,
+      limit: this.defaultImageLimit,
       tags: []
   });
-
-  private images: ImageData[];
-  public imagesWrapped$ = new EventEmitter<ImageData[]>();
 
   constructor(private store: AngularFirestore) {
       this.storageRef = firebase.storage().ref();
 
       this.tagsFBCollectionRef = store.collection<ITagObject>('tags', ref => ref.orderBy('value', 'asc'));
       this.tagList$ = this.tagsFBCollectionRef.valueChanges().pipe(map(tags => tags.map(tag => (<ITagObject>tag).value)));
+      this.tagList$.subscribe(tags => {
+         this.currentTagList = tags;
+      });
 
       this.imagesFBCollectionRef = store.collection<ImageData>('images', ref => ref.orderBy('filePath', 'desc'));
       this.imageList$ = this.imagesFBCollectionRef.snapshotChanges().pipe(map(changes => {
@@ -102,6 +108,10 @@ export class ImageCrudService {
   }
 
   public upload(file: File) {
+      this.uploadOne(file);
+  }
+
+  public uploadOne(file: File) {
       console.log('upload', file);
 
       const origFileName = file.name;
@@ -177,11 +187,31 @@ export class ImageCrudService {
           image.tags = [];
       }
       image.tags.push(tag);
-      this.imagesFBCollectionRef.doc(image.id).update(image);
+      this.imagesFBCollectionRef.doc(image.id).update({tags: image.tags});
+    }
+
+    addTagToMultipleImages(images: ImageData[], tags: string[]) {
+      console.log(images, tags);
+      images.forEach(image => {
+         const tagsToAdd = tags.filter(tag => image.tags.indexOf(tag) === -1);
+         if (tagsToAdd.length) {
+             image.tags = image.tags.concat(tagsToAdd);
+             this.imagesFBCollectionRef.doc(image.id).update({tags: image.tags});
+         }
+      });
+      const tagsToAdd = tags.filter(tag => this.currentTagList.indexOf(tag) === -1);
+      if (tagsToAdd.length) {
+        console.log(tagsToAdd);
+        tagsToAdd.forEach(tag => {
+            this.tagsFBCollectionRef.add({
+                value: tag
+            });
+        });
+      }
     }
 
     removeTagFromImage(image: ImageData, tag: string) {
       image.tags = image.tags.filter(imageTag => tag !== imageTag);
-      this.imagesFBCollectionRef.doc(image.id).update(image).then(res => console.log(res)).catch(err => console.log(err));
+      this.imagesFBCollectionRef.doc(image.id).update({tags: image.tags}).then(res => console.log(res)).catch(err => console.log(err));
     }
 }

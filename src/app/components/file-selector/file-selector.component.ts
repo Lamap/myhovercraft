@@ -23,17 +23,25 @@ export class FileSelectorComponent implements OnInit {
     }
 
     fileAdded($event) {
+        console.log($event.target.files);
         this.selectedFile = $event.target.files.item(0);
-        const hasError: string | boolean = this.isInvalid(this.selectedFile);
-        if (!hasError) {
-            const reader = new FileReader();
-            reader.readAsDataURL(this.selectedFile);
-            reader.onload = (event) => {
-                this.tempLoadedFile = (<any>event.target).result;
-                this.fileSelected$.emit(this.selectedFile);
-            };
-        } else {
-            alert(hasError);
+        const errors: string[] = [];
+        const uploads: File[] = [];
+
+        for (let i = 0; i < $event.target.files.length; i++) {
+            const file = $event.target.files[i];
+            const isInvalid = this.isInvalid(file);
+            if (isInvalid) {
+                errors.push(isInvalid);
+            } else {
+                uploads.push(file);
+                const reader = new FileReader();
+                reader.readAsDataURL(this.selectedFile);
+                reader.onload = (event) => {
+                    this.tempLoadedFile = (<any>event.target).result;
+                    this.fileSelected$.emit(file);
+                };
+            }
         }
     }
 

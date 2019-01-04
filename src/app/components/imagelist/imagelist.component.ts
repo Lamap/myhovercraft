@@ -15,18 +15,21 @@ export class ImagelistComponent implements OnInit {
 
   public images: ImageData[];
   public structuredImages: ImageData[][] = [];
-  private colClassBase = 'hvr-imagelist__items-col--split-';
-
   public availableTags: string[] = [];
   public colCount = 4;
   public colClass: string;
+
+  private colClassBase = 'hvr-imagelist__items-col--split-';
+  private imageBaseWidth = 220;
+
+  private selectedImages: ImageData[] = [];
 
   constructor(private imageService: ImageCrudService, public authService: AuthenticationService) {
 
     this.imageService.imagesWrapped$.subscribe(images => {
       this.images = images;
-
       this.structuredImages = this.calculateStructuredImageList(images);
+      this.selectedImages = [];
       console.log('structureImages', this.structuredImages);
     });
 
@@ -43,7 +46,7 @@ export class ImagelistComponent implements OnInit {
   }
 
   calculateStructuredImageList(images: ImageData[]): ImageData[][] {
-      this.colCount = Math.floor(window.innerWidth / 300);
+      this.colCount = Math.floor(window.innerWidth / this.imageBaseWidth);
       this.colClass = this.colClassBase + this.colCount;
       console.log('calc', this.colCount, this.colClass);
       const structuredImages: ImageData[][] = [];
@@ -86,4 +89,30 @@ export class ImagelistComponent implements OnInit {
     this.imageService.removeTagFromImage(image, tag);
   }
 
+  loadMore(event) {
+    if (event.visible) {
+        const querySnapshot = this.imageService.query$.getValue();
+        querySnapshot.limit += this.colCount * 3;
+        this.imageService.query$.next(querySnapshot);
+    }
+  }
+
+  toggleSelection(image: ImageData) {
+      console.log(image);
+      image.selected = !image.selected;
+      this.selectedImages = this.images.filter(item => item.selected);
+  }
+
+  clearSelection() {
+      this.selectedImages.map(image => {
+          return image.selected = false;
+      });
+      this.selectedImages = [];
+  }
+
+  tagSelected(tag: string) {
+      const querySnapshot = this.imageService.query$.getValue();
+      querySnapshot.tags = [tag];
+      this.imageService.query$.next(querySnapshot);
+  }
 }

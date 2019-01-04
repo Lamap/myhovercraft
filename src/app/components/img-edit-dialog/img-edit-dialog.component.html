@@ -1,0 +1,35 @@
+<div class="hvr-img-editor">
+  <mat-form-field class="hvr-img-editor__form">
+    <mat-chip-list #chipList>
+      <mat-chip
+              *ngFor="let tag of selectedTags"
+              [selectable]="false"
+              [removable]="true"
+              (removed)="removeTag(tag)"
+      >
+        {{tag}}
+        <mat-icon matChipRemove >cancel</mat-icon>
+      </mat-chip>
+      <input
+              #tagInput
+              matInput
+              type="text"
+              placeholder="Add tags to the {{data.images.length}} selected images"
+              [formControl]="tagFormControl"
+              [matAutocomplete]="auto"
+              [matChipInputFor]="chipList"
+              [matChipInputAddOnBlur]="true"
+              (matChipInputTokenEnd)="addNewTag($event)"
+      >
+    </mat-chip-list>
+    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectTag($event)">
+      <mat-option *ngFor="let tag of filteredTags" [value]="tag">
+        {{tag}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+  <div class="hvr-img-editor__actions">
+    <button class="hvr-img-editor__cancel btn btn-light" (click)="cancel()">Cancel</button>
+    <button class="hvr-img-editor__apply btn btn-secondary" (click)="apply()">Add</button>
+  </div>
+</div>
