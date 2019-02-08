@@ -24,6 +24,7 @@
               (replace$)="replaceImage($event, image)"
               (toggleImage$)="toggleSelection(image)"
               (tagSelected$)="tagSelected($event)"
+              (togglePublicState$)="togglePublicity(image)"
       ></hvr-imagelist-item>
     </div>
   </div>
@@ -33,4 +34,9 @@
     [inViewportOptions]="{ threshold: [0] }"
     (inViewportAction)="loadMore($event)"
   ></div>
+  <div class="hvr-imagelist__load-rest" *ngIf="restImageCount">
+    <span class="hvr-imagelist__load-rest-count">
+      still <b>{{restImageCount}}</b> more
+    </span>
+  </div>
 </div>

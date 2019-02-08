@@ -1,4 +1,4 @@
-<div class="hvr-imagelist-item" [ngClass]="{'hvr-imagelist-item--selected': image.selected}">
+<div class="hvr-imagelist-item" [ngClass]="{'hvr-imagelist-item--selected': image.selected, 'hvr-imagelist-item--public': image.isPublic}">
   <div class="hvr-imagelist-item__actions">
     <span *ngIf="authService.user$ | async" class="hvr-imagelist-item__remove" (click)="removeMe()">
       <i  class="material-icons">delete</i>
@@ -17,12 +17,16 @@
     >
       <i  class="material-icons">archive</i>
     </a>
-    <span *ngIf="authService.user$ | async" class="hvr-imagelist-item__open" (click)="openInModal()">
-      <i  class="material-icons">open_in_new</i>
-    </span>
   </div>
-
-  <img class="hvr-imagelist-item__image" [src]="image.url" (click)="imageClicked()"/>
+  <span class="hvr-imagelist-item__state-group" *ngIf="authService.user$ | async" >
+    <span class="hvr-imagelist-item__select" (click)="toggleImage()">
+      <i  class="material-icons hvr-imagelist-item__select-icon">bookmark_border</i>
+    </span>
+    <span class="hvr-imagelist-item__publicity" (click)="togglePublicState()">
+      <i  class="material-icons hvr-imagelist-item__publicity-icon">public</i>
+    </span>
+  </span>
+  <img class="hvr-imagelist-item__image" [src]="image.url" (click)="openInModal()"/>
   <div class="hvr-imagelist-item__static-tags" *ngIf="!(authService.user$ | async) && image.tags.length">
     <span
       class="hvr-imagelist-item__static-tag-item"

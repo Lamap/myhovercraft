@@ -19,6 +19,7 @@
                     [matAutocomplete]="auto"
                     [matChipInputFor]="chipList"
                     [matChipInputAddOnBlur]="true"
+                    [disabled]="onlyTagless"
             >
         </mat-chip-list>
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectTag($event)">
@@ -27,6 +28,14 @@
             </mat-option>
         </mat-autocomplete>
     </mat-form-field>
+    <mat-checkbox
+        *ngIf="authService.user$ | async"
+        (change)="onTaglessChanged($event)"
+        [(ngModel)]="onlyTagless"
+        class="hvr-imagelist-header__non-tagged-checkbox"
+    >
+        Show only non tagged
+    </mat-checkbox>
     <div class="hvr-imagelist-header__actions" *ngIf="authService.user$ | async">
         <span *ngIf="selectedImages && selectedImages.length > 1">
              <span class="hvr-imagelist-header__add-tag" (click)="addTag()">

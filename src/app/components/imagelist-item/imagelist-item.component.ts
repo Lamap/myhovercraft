@@ -23,6 +23,7 @@ export class ImagelistItemComponent implements OnInit {
   @Output() removeTag$ = new EventEmitter<string>();
   @Output() toggleImage$ = new EventEmitter<VoidFunction>();
   @Output() tagSelected$ = new EventEmitter<String>();
+  @Output() togglePublicState$ = new EventEmitter<VoidFunction>();
 
   public tagFormControl  = new FormControl();
   public filteredAllTags: string[];
@@ -84,8 +85,12 @@ export class ImagelistItemComponent implements OnInit {
     this.removeTag$.emit(tag);
   }
 
-  imageClicked() {
+  toggleImage() {
     this.toggleImage$.emit();
+  }
+
+  togglePublicState() {
+    this.togglePublicState$.emit();
   }
 
   openInModal() {

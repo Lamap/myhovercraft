@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ImageCrudService, ImageData } from '../../services/image-crud.service';
+import { ImageCrudService, ImageData, ImageListData } from '../../services/image-crud.service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { Observable, fromEvent } from 'rxjs/index';
 
@@ -18,6 +18,7 @@ export class ImagelistComponent implements OnInit {
   public availableTags: string[] = [];
   public colCount = 4;
   public colClass: string;
+  public restImageCount = 0;
 
   private colClassBase = 'hvr-imagelist__items-col--split-';
   private imageBaseWidth = 220;
@@ -26,9 +27,10 @@ export class ImagelistComponent implements OnInit {
 
   constructor(private imageService: ImageCrudService, public authService: AuthenticationService) {
 
-    this.imageService.imagesWrapped$.subscribe(images => {
-      this.images = images;
-      this.structuredImages = this.calculateStructuredImageList(images);
+    this.imageService.imageListData$.subscribe( (dataSnapshot: ImageListData) => {
+      this.restImageCount = dataSnapshot.total - dataSnapshot.items.length;
+      this.images = dataSnapshot.items;
+      this.structuredImages = this.calculateStructuredImageList(this.images);
       this.selectedImages = [];
       console.log('structureImages', this.structuredImages);
     });
@@ -113,6 +115,12 @@ export class ImagelistComponent implements OnInit {
   tagSelected(tag: string) {
       const querySnapshot = this.imageService.query$.getValue();
       querySnapshot.tags = [tag];
+      querySnapshot.limit = this.colCount * 3;
       this.imageService.query$.next(querySnapshot);
   }
+
+  togglePublicity(image: ImageData) {
+      this.imageService.setPublicState(image, !image.isPublic);
+  }
+
 }

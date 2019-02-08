@@ -2,8 +2,8 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, forkJoin, combineLatest } from 'rxjs/index';
 import * as firebase from 'firebase';
 import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
-import { map, switchMap, mapTo, filter } from 'rxjs/internal/operators';
-import {forEach} from "@angular/router/src/utils/collection";
+import { map } from 'rxjs/internal/operators';
+import { AuthenticationService } from './authentication.service';
 
 export interface ImageData {
   url: string;
@@ -12,11 +12,18 @@ export interface ImageData {
   filePath: string;
   originalName: string;
   selected?: boolean;
+  isPublic?: boolean;
 }
 
 export interface ImageQuery {
     limit: number;
     tags: string[];
+    onlyTagless?: Boolean;
+}
+
+export interface ImageListData {
+    items: ImageData[];
+    total: number;
 }
 
 interface ITagObject {
@@ -34,19 +41,21 @@ export class ImageCrudService {
   private tagsFBCollectionRef: AngularFirestoreCollection<ITagObject>;
   private images: ImageData[];
   private currentTagList: string[] = [];
+  private user: boolean;
 
   public defaultImageLimit = 20;
   public taskProgress = 0;
   public imageList$: Observable<ImageData[]>;
-  public imagesWrapped$ = new EventEmitter<ImageData[]>();
+  public imageListData$ = new EventEmitter<ImageListData>();
 
   public tagList$: Observable<string[]>;
   public query$ = new BehaviorSubject<ImageQuery | null>({
       limit: this.defaultImageLimit,
-      tags: []
+      tags: [],
+      onlyTagless: false
   });
 
-  constructor(private store: AngularFirestore) {
+  constructor(private store: AngularFirestore, private authService: AuthenticationService) {
       this.storageRef = firebase.storage().ref();
 
       this.tagsFBCollectionRef = store.collection<ITagObject>('tags', ref => ref.orderBy('value', 'asc'));
@@ -64,29 +73,30 @@ export class ImageCrudService {
              return data;
           });
       }));
+
+      // TODO: merge these into 1 stream
+
       this.imageList$.subscribe(images => {
-          this.images = images;
-          if (!this.images) {
-              return;
-          }
-          this.imagesWrapped$.emit(this.queryList(this.images));
+        this.images = images;
+        this.emitImageList();
       });
 
       this.query$.subscribe(querySnapshot => {
-          if (!this.images) {
-              return;
-          }
-         this.imagesWrapped$.emit(this.queryList(this.images));
+        this.emitImageList();
+      });
+
+      this.authService.user$.subscribe(user => {
+        console.log('auth user', user);
+        this.user = !!user;
+        this.emitImageList();
       });
   }
 
-  queryList(images: ImageData[]) {
-      const querySnapshot: ImageQuery = this.query$.getValue();
-      // TODO: include filtering so use the same querysnapshot
-      if (!querySnapshot.tags.length) {
-          return images.slice(0, querySnapshot.limit);
+  emitImageList = () => {
+      if (!this.images) {
+          return;
       }
-      return images.filter(this.filterImage).slice(0, querySnapshot.limit);
+      this.imageListData$.emit(this.queryList(this.images));
   }
 
   filterImage = (image) => {
@@ -138,6 +148,33 @@ export class ImageCrudService {
           });
   }
 
+    queryList(images: ImageData[]): ImageListData {
+        const querySnapshot: ImageQuery = this.query$.getValue();
+        // TODO: include filtering so use the same querysnapshot
+
+        images = this.user ? images : images.filter(image => image.isPublic);
+
+        if (querySnapshot.onlyTagless) {
+            const nonTaggedImages = images.filter(item => !item.tags || !item.tags.length);
+            return {
+                items: nonTaggedImages.slice(0, querySnapshot.limit),
+                total: nonTaggedImages.length
+            };
+        }
+
+        if (!querySnapshot.tags.length) {
+            return {
+                items: images.slice(0, querySnapshot.limit),
+                total: images.length
+            };
+        }
+        const filteredImages = images.filter(this.filterImage);
+        return {
+            items: filteredImages.slice(0, querySnapshot.limit),
+            total: filteredImages.length
+        };
+    }
+
     createNewImageData(url: string, originalName: string, filePath: string) {
         const newItem: ImageData = {
             url: url,
@@ -173,6 +210,15 @@ export class ImageCrudService {
             });
     }
 
+    setBulkPublicState (images: ImageData[], state) {
+      //
+    }
+
+    setPublicState (image: ImageData, value: boolean) {
+      console.log('setPublicState', value);
+        this.imagesFBCollectionRef.doc(image.id).update({isPublic: value});
+    }
+
     addNewTag(image: ImageData, tag: string) {
         this.tagsFBCollectionRef.add({
             value: tag
@@ -191,7 +237,6 @@ export class ImageCrudService {
     }
 
     addTagToMultipleImages(images: ImageData[], tags: string[]) {
-      console.log(images, tags);
       images.forEach(image => {
          const tagsToAdd = tags.filter(tag => image.tags.indexOf(tag) === -1);
          if (tagsToAdd.length) {

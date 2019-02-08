@@ -20,6 +20,7 @@ export class ImagelistHeaderComponent implements OnInit {
 
     public filteredTags: string[];
     public tagFormControl  = new FormControl();
+    public onlyTagless = false;
 
     @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
@@ -83,5 +84,12 @@ export class ImagelistHeaderComponent implements OnInit {
     }
     clear() {
         this.clearSelections$.emit();
+    }
+
+    onTaglessChanged($event) {
+        console.log($event, this.onlyTagless);
+        const querySnapshot = this.imageService.query$.getValue();
+        querySnapshot.onlyTagless = this.onlyTagless;
+        this.imageService.query$.next(querySnapshot);
     }
 }

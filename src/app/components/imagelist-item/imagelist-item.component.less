@@ -10,15 +10,8 @@
   &--selected {
     border: 2px solid #6c757d;
     box-shadow: rgba(0, 0, 0, .4) 4px 4px 4px;
-    &:after {
-      content: '';
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 20px;
-      width: 100%;
-      background: rgba(0, 0, 0, .6);
+    .hvr-imagelist-item__select-icon {
+      transform: rotate(-45deg);
     }
   }
   &__image {
@@ -26,7 +19,7 @@
   }
   &__actions {
     opacity: 0;
-    transition: opacity 0.5s;
+    transition: opacity 0.3s;
     .hvr-imagelist-item:hover & {
       opacity: 1;
     }
@@ -48,11 +41,48 @@
     top: 76px;
     right: 0;
   }
-  &__open {
-    .hvr-rounded-button;
+  &__state-group {
+    opacity: 0;
     position: absolute;
-    top: 112px;
-    right: 0;
+    left: 0;
+    top: 0;
+    border-bottom-right-radius: 8px;
+    width: 40px;
+    background: #6c757d;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    .hvr-imagelist-item--selected &,
+    .hvr-imagelist-item:hover & {
+      opacity: 1;
+    }
+  }
+  &__select {
+    height: 40px;
+    user-select: none;
+    display: block;
+    transition: opacity 0.2s;
+    cursor: pointer;
+    .hvr-imagelist-item:hover &,
+    .hvr-imagelist-item--selected & {
+      display: block;
+    }
+  }
+  &__publicity {
+    height: 40px;
+    user-select: none;
+    transition: opacity 0.2s;
+    cursor: pointer;
+  }
+  &__publicity-icon {
+    .hvr-imagelist-item--public & {
+      color: #ffd725;
+    }
+  }
+  &__select-icon {
+    transition: transform 0.2s;
   }
   &__static-tags {
     padding: 5px;
